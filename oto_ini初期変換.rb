@@ -8,6 +8,17 @@ BEGIN {
 	puts "\n"
 }
 
+#----------------------------------------------------
+# function
+#----------------------------------------------------
+
+# 進捗表示(time回ずつ点を打つ)
+def puts_progress(i, time)
+	if (i % time) == 0
+		putc "."
+	end
+end
+
 def convert(rows)
 	rows.each_with_index do |row, i|
 		wav_name = row[0]
@@ -28,12 +39,8 @@ def convert(rows)
 			#p wav_name.encode("Windows-31J")
 		end
 
-		# 進捗表示
-		if i % 10 == 0
-			putc "."
-		end
+		puts_progress(i, 10)
 	end
-	puts "\n\n"
 
 	return rows
 end
@@ -52,6 +59,7 @@ rows = CSV.read(file_pass, encoding: "Windows-31J:UTF-8")
 
 puts "変換開始"
 rows = convert(rows)
+puts "\n完了\n\n"
 
 CSV.open("oto_output.ini","w", encoding: "Windows-31J:UTF-8") do |output_line|
 	rows.each do |row|
