@@ -4,9 +4,20 @@ require 'csv'
 
 BEGIN {
 	puts __FILE__
-	puts "あ行と「ん」の先行発音を5、オーバーラップを0に、\nか行「たつと」ぱ行のオーバーラップを-30にする\n"
-	puts "\n"
+	puts "あ行と「ん」の先行発音を5、オーバーラップを0に、"
+	puts "か行「たつと」ぱ行のオーバーラップを-30にする"
+	puts "\n\n"
 }
+
+END{
+	puts "\n\n"
+	puts "終了。。。"
+}
+
+IN_FILE_NAME = "oto.ini"
+OUT_FILE_NAME = "oto_output.ini"
+FILE_ENCODING = "Windows-31J"	# oto.iniのエンコード
+RUBY_ENCODING = "UTF-8"	# Ruby内部で使う文字コード
 
 #----------------------------------------------------
 # function
@@ -24,19 +35,12 @@ def convert(rows)
 		wav_name = row[0]
 
 		if /[あいうえおん]/ =~ wav_name
-			# 先行発音を5に固定
-			rows[i][4] = "5"
-	
-			# オーバーラップを0に固定
-			rows[i][5] = "0"
-	
-			#p wav_name.encode("Windows-31J")
+			rows[i][4] = "5"	# 先行発音を5に固定
+			rows[i][5] = "0"	# オーバーラップを0に固定
 		end
 
 		if /[かきくけこたつとぱぴぷぺぽ]/ =~ wav_name
-			# オーバーラップを-30に固定
-			rows[i][5] = "-30"
-			#p wav_name.encode("Windows-31J")
+			rows[i][5] = "-30"	# オーバーラップを-30に固定
 		end
 
 		puts_progress(i, 10)
@@ -49,22 +53,22 @@ end
 # main
 #----------------------------------------------------
 
-if ARGV.size == 1 && File.extname(ARGV[0]) == ".ini"
+if ARGV.size == 1 && File.basename(ARGV[0]) == IN_FILE_NAME
 	file_pass = ARGV[0]
 else
-	raise ArgumentError, "oto.iniへのパスを指定してね"
+	raise ArgumentError, "#{IN_FILE_NAME} へのパスを指定してね"
 end
 
-rows = CSV.read(file_pass, encoding: "Windows-31J:UTF-8")
+rows = CSV.read(file_pass, encoding: "#{FILE_ENCODING}:#{RUBY_ENCODING}")
 
 puts "変換開始"
 rows = convert(rows)
 puts "\n完了\n\n"
 
-CSV.open("oto_output.ini","w", encoding: "Windows-31J:UTF-8") do |output_line|
+CSV.open(OUT_FILE_NAME,"w", encoding: "#{FILE_ENCODING}:#{RUBY_ENCODING}") do |output_line|
 	rows.each do |row|
 		output_line << row
 	end
 end
 
-puts "oto_output.iniを出力したよ"
+puts "#{OUT_FILE_NAME}を出力したよ"
